@@ -13,20 +13,28 @@ export class Partition {
     append(message: Omit<Message, "offset">) : Message {
         const newMessage: Message = {
             ...message, 
-            offset: this.nextOffset++
+            offset: this.nextOffset
         }
 
         this.messages.push(newMessage)
+
+        this.nextOffset++
 
         return newMessage
     }
 
     read(offset: number) : Message | null {
+        if(offset < 0 || offset > this.nextOffset) {
+            return null
+        }
+        
         return this.messages[offset] ?? null
     }
 
     getMessage() : Message[] {
-        return this.messages
+        const messages = this.messages
+
+        return messages
     }
 
     getLatestOffset() : number {
