@@ -8,7 +8,11 @@ export class Partition {
 
     constructor (
         public readonly partitionId: number
-    ) {}
+    ) {
+        if(partitionId < 0) {
+            throw new Error("Invalid partitionId")
+        }
+    }
 
     append(message: Omit<Message, "offset">) : Message {
         const newMessage: Message = {
@@ -24,15 +28,15 @@ export class Partition {
     }
 
     read(offset: number) : Message | null {
-        if(offset < 0 || offset > this.nextOffset) {
+        if(offset < 0) {
             return null
         }
-        
+
         return this.messages[offset] ?? null
     }
 
     getMessage() : Message[] {
-        const messages = this.messages
+        const messages = [...this.messages]
 
         return messages
     }
