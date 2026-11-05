@@ -1,3 +1,4 @@
+import { ConsumerGroup } from "../consumer/ConsumerGroup.js";
 import type { Message } from "../types/Message.js";
 import { Topic } from "./Topic.js";
 import { v4 as uuid} from 'uuid'
@@ -5,6 +6,8 @@ import { v4 as uuid} from 'uuid'
 
 export class Broker {
     private topics: Map<string, Topic> = new Map()
+
+    private consumerGroups: Map<string, ConsumerGroup> = new Map()
 
     createTopic(
         name: string, 
@@ -38,6 +41,15 @@ export class Broker {
     }
 
     deleteTopic(name: string) : boolean {
+        // Groups bound to a deleted topic can no longer commit or poll
+        for(const [groupId, group] of this.consumerGroups) {
+            if(group.getTopicName() === name) {
+                group.close()
+
+                this.consumerGroups.delete(groupId)
+            }
+        }
+
         return this.topics.delete(name)
     }
 
@@ -60,5 +72,46 @@ export class Broker {
         })
 
         return message
+    }
+
+    createConsumerGroup(
+        groupId: string,
+        topicName: string
+    ) : ConsumerGroup {
+        if(this.consumerGroups.has(groupId)) {
+            throw new Error(`Consumer Group already exists: ${groupId}`)
+        }
+
+        const group = new ConsumerGroup(
+            this,
+            groupId,
+            topicName
+        )
+
+        this.consumerGroups.set(groupId, group)
+
+        return group
+    }
+
+    getConsumerGroup(groupId: string) : ConsumerGroup {
+        const group = this.consumerGroups.get(groupId)
+
+        if(!group) {
+            throw new Error(`Consumer Group not found: ${groupId}`)
+        }
+
+        return group
+    }
+
+    deleteConsumerGroup(groupId: string) : boolean {
+        const group = this.consumerGroups.get(groupId)
+
+        if(!group) {
+            return false
+        }
+
+        group.close()
+
+        return this.consumerGroups.delete(groupId)
     }
 }

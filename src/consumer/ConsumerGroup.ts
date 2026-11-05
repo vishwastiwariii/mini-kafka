@@ -231,8 +231,12 @@ export class ConsumerGroup {
     }
 
     // Copy of partitionId -> next offset to consume
-    getCommitedOffsets() : Map<number, number> {
+    getCommittedOffsets() : Map<number, number> {
         return new Map(this.commitedOffsets)
+    }
+
+    getTopicName() : string {
+        return this.topicName
     }
 
     getGeneration() : number {
