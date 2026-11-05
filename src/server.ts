@@ -71,7 +71,7 @@ app.get("/topics/:name", (req, res) => {
 
   try {
 
-    const topic = broker.getTopics(req.params.name);
+    const topic = broker.getTopic(req.params.name);
 
     res.json({
 
@@ -81,7 +81,7 @@ app.get("/topics/:name", (req, res) => {
 
         partitionId: p.partitionId,
 
-        messages: p.getMessage(),
+        messages: p.getMessages(),
 
         latestOffset: p.getLatestOffset()
 

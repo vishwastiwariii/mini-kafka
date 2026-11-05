@@ -25,7 +25,7 @@ export class Broker {
         const topic = this.topics.get(name)
 
         if(!topic) {
-            throw new Error("Topics not found")
+            throw new Error(`Topic not found: ${name}`)
         }
 
         return topic
@@ -38,10 +38,6 @@ export class Broker {
     }
 
     deleteTopic(name: string) : boolean {
-        if(!this.topics.has(name)) {
-            throw new Error("No topics exists")
-        }
-
         return this.topics.delete(name)
     }
 

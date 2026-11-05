@@ -15,10 +15,10 @@ export class Partition {
     }
 
     append(message: Omit<Message, "offset">) : Message {
-        const newMessage: Message = {
+        const newMessage: Message = Object.freeze({
             ...message, 
             offset: this.nextOffset
-        }
+        })
 
         this.messages.push(newMessage)
 
@@ -28,14 +28,14 @@ export class Partition {
     }
 
     read(offset: number) : Message | null {
-        if(offset < 0) {
+        if(!Number.isInteger(offset) || offset < 0) {
             return null
         }
 
         return this.messages[offset] ?? null
     }
 
-    getMessage() : Message[] {
+    getMessages() : Message[] {
         const messages = [...this.messages]
 
         return messages
