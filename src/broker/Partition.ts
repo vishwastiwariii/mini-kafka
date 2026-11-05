@@ -16,6 +16,8 @@ export class Partition {
             offset: this.nextOffset++
         }
 
+        this.messages.push(newMessage)
+
         return newMessage
     }
 
