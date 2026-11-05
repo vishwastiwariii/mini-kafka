@@ -21,7 +21,7 @@ export class Broker {
         return topic
     }
 
-    getTopics(name: string) : Topic {
+    getTopic(name: string) : Topic {
         const topic = this.topics.get(name)
 
         if(!topic) {
@@ -31,14 +31,28 @@ export class Broker {
         return topic
     }
 
+    listTopics() : string[] {
+       const topics = [...this.topics.keys()]
+
+       return topics
+    }
+
+    deleteTopic(name: string) : boolean {
+        if(!this.topics.has(name)) {
+            throw new Error("No topics exists")
+        }
+
+        return this.topics.delete(name)
+    }
+
     publish(
         topicName: string, 
         key: string | undefined, 
         value: any
     ) : Message {
-        const topic = this.getTopics(topicName)
+        const topic = this.getTopic(topicName)
 
-        const partition = topic.selectPartiton(key)
+        const partition = topic.selectPartition(key)
 
         const message = partition.append({
             id: uuid(), 
